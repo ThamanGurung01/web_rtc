@@ -1,4 +1,4 @@
-import {WebSocketServer} from "ws";
+import WebSocket,{WebSocketServer} from "ws";
 const wss=new WebSocketServer({ port: 3000 });
 let clients=[];
 wss.on("connection",(ws)=>{

@@ -39,12 +39,29 @@ const pc=new RTCPeerConnection({
     }
   ]
 });
+const socket=new WebSocket("ws://localhost:3000");
+pc.onicecandidate=(event)=>{
+  if(event.candidate && socket.readyState === WebSocket.OPEN){
+  socket.send(JSON.stringify({type:"candidate",candidate: event.candidate}));
+  }
+}
 captureStream.getTracks().forEach(track=>{
   pc.addTrack(track,captureStream);
 })
-const offer=await pc.createOffer();
+socket.onopen=async()=>{
+const offer= await pc.createOffer();
 await pc.setLocalDescription(offer);
-console.log("offer",offer);
+socket.send(JSON.stringify({type:"offer",sdp:offer}));
+}
+socket.onmessage=async(message)=>{
+  const data=JSON.parse(message.data);
+if(data.type==="answer"){
+  await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+}
+  if(data.type==="candidate"){
+    await pc.addIceCandidate(data.candidate);
+  }
+};
 }
 offerElem.addEventListener("click",async()=>{
  await createOffer(displayMediaOptions);
