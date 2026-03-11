@@ -8,7 +8,11 @@ const initReceiver=async()=>{
               urls:"stun:stun.l.google.com:19302"
             }
         ]});
-    const socket=new WebSocket("ws://localhost:3000");
+const ua = navigator.userAgent;
+const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(ua);
+const isDesktop = /Windows|Macintosh|Linux/i.test(ua) && !isMobile;
+const socketUrl=isMobile?"ws://192.168.254.142:3000":isDesktop?"ws://localhost:3000":"ws://localhost:3000";
+    const socket=new WebSocket(socketUrl);
         pc.onicecandidate=(event)=>{
         if(event.candidate&&socket.readyState === WebSocket.OPEN){
         socket.send(JSON.stringify({type:"candidate",candidate: event.candidate}));

@@ -4,6 +4,7 @@ let clients=[];
 wss.on("connection",(ws)=>{
     clients.push(ws);
     ws.on("message",(message)=>{
+        console.log("Received message:", message.toString());
         clients.forEach(client=>{
             if(client!==ws&&client.readyState===WebSocket.OPEN){
                 client.send(message.toString());
